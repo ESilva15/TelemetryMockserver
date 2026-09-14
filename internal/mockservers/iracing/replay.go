@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -31,6 +32,7 @@ type Replayer struct {
 
 func NewReplayer(input string, output string) (*Replayer, error) {
 	ibt, err := goirsdk.Init(goirsdk.Options{
+		Logger:        slog.Default(),
 		SourceType:    goirsdk.IBTFile,
 		SourcePath:    "../testTelemetry/gt3_mustang_bathurst.ibt",
 		IBTExportType: goirsdk.SharedMemoryFile,
@@ -77,9 +79,15 @@ func (r *Replayer) Replay(ctx context.Context, loop bool) error {
 		gear := int32(r.SDK.Vars.Vars["Gear"].Value.(int))
 		rpm := int32(r.SDK.Vars.Vars["RPM"].Value.(float32))
 		speed := int32(r.SDK.Vars.Vars["Speed"].Value.(float32))
+		sessionState := r.SDK.Vars.Vars["SessionState"].Value.(int)
 
 		fmt.Printf("\033[?25l\033[2J\033[H")
-		fmt.Printf("Gear: %d, RPM: %d, Speed: %d", gear, rpm, speed)
+		fmt.Printf("Gear: %d, RPM: %d, Speed: %d\n", gear, rpm, speed)
+		fmt.Printf("\n")
+		fmt.Printf("IsConnected: %t\n", r.SDK.IsConnected())
+		fmt.Printf("  SessionStatusConnected: %t\n", r.SDK.SessionStatusConnected())
+		fmt.Printf("  SessionStatusInvalid:   %t\n", r.SDK.SessionStateInvalid())
+		fmt.Printf("  SessionState:           %d\n", sessionState)
 
 		<-mainLoopTicker.C
 	}
