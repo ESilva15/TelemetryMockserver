@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	beamng "github.com/ESilva15/TelemetryMockserver/internal/mockservers/beamng"
 
@@ -59,14 +60,16 @@ func replayAction(cmd *cobra.Command, args []string) {
 
 	replayer, err := beamng.NewReplayer(address, port, inputFile)
 	if err != nil {
-		fmt.Printf("Something went wrong setting up the player: %+v", err)
+		slog.Error("Something went wrong setting up the player", "err", err)
 		return
 	}
 
 	// NOTE: is this doing anything at all??
 	ctx := context.Background()
-	if err := replayer.Replay(ctx, loop); err != nil {
-		fmt.Printf("Something went wrong while playing the file: %v", err)
+	err = replayer.Replay(ctx, loop)
+	if err != nil {
+		slog.Error("Something went wrong while playing the file", "err", err)
+		return
 	}
 }
 
