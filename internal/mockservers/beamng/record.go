@@ -3,7 +3,7 @@ package mockserver
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -30,24 +30,25 @@ type Recorder struct {
 }
 
 func NewRecorder(fp string, address string, port int) (*Recorder, error) {
-	var recorder Recorder
-	var err error
+	// var recorder Recorder
+	// var err error
+	//
+	// recorder.SDK, err = bngsdk.Init(address, port)
+	// if err != nil {
+	// 	return &Recorder{}, err
+	// }
+	//
+	// recorder.OutputFile, err = os.Create(fp)
+	// if err != nil {
+	// 	return &Recorder{}, err
+	// }
+	//
+	// recorder.viewData = recorderViewData{}
+	// recorder.viewCh = make(chan *recorderViewData, 1)
+	// recorder.recorderCh = make(chan []byte, 1)
 
-	recorder.SDK, err = bngsdk.Init(address, port)
-	if err != nil {
-		return &Recorder{}, err
-	}
-
-	recorder.OutputFile, err = os.Create(fp)
-	if err != nil {
-		return &Recorder{}, err
-	}
-
-	recorder.viewData = recorderViewData{}
-	recorder.viewCh = make(chan *recorderViewData, 1)
-	recorder.recorderCh = make(chan []byte, 1)
-
-	return &recorder, nil
+	// return &recorder, nil
+	return nil, errors.New("not implemented")
 }
 
 func (r *Recorder) Close() {
@@ -59,21 +60,21 @@ func (r *Recorder) Close() {
 }
 
 func (r *Recorder) record(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case data := <-r.recorderCh:
-			r.mut.Lock()
-			err := binary.Write(r.OutputFile, binary.LittleEndian, r.SDK.Data)
-			r.TotalBytes += len(data)
-			r.mut.Unlock()
-
-			if err != nil {
-				// NOTE: find a way of logging this somehow
-			}
-		}
-	}
+	// for {
+	// 	select {
+	// 	case <-ctx.Done():
+	// 		return
+	// 	case data := <-r.recorderCh:
+	// 		r.mut.Lock()
+	// 		err := binary.Write(r.OutputFile, binary.LittleEndian, r.SDK.Data)
+	// 		r.TotalBytes += len(data)
+	// 		r.mut.Unlock()
+	//
+	// 		if err != nil {
+	// 			// NOTE: find a way of logging this somehow
+	// 		}
+	// 	}
+	// }
 }
 
 func (r *Recorder) view(ctx context.Context) {
@@ -98,7 +99,7 @@ func (r *Recorder) view(ctx context.Context) {
 
 			r.viewDataMut.RLock()
 			nBytes = viewData.TotalBytes
-			stringifyOutgaugeData(&buf, &r.SDK)
+			// stringifyOutgaugeData(&buf, &r.SDK)
 			r.viewDataMut.RUnlock()
 
 			_, _ = buf.WriteTo(os.Stdout)
@@ -119,28 +120,28 @@ func (r *Recorder) Record(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			err := r.SDK.ReadData()
-			if err != nil {
-				return err
-			}
-
-			r.viewData.TotalBytes = r.TotalBytes
-
-			// Send the data to the view
-			select {
-			case r.viewCh <- &r.viewData:
-				// Sent the data
-			default:
-				// Dropped the frame!
-			}
-
-			// Write the data to the file
-			select {
-			case r.recorderCh <- r.SDK.Buffer:
-				// Sent the data
-			default:
-				// Dropped the frame!
-			}
+			// err := r.SDK.ReadData(100 * time.Millisecond)
+			// if err != nil {
+			// 	return err
+			// }
+			//
+			// r.viewData.TotalBytes = r.TotalBytes
+			//
+			// // Send the data to the view
+			// select {
+			// case r.viewCh <- &r.viewData:
+			// 	// Sent the data
+			// default:
+			// 	// Dropped the frame!
+			// }
+			//
+			// // Write the data to the file
+			// select {
+			// case r.recorderCh <- r.SDK.GetBuffer():
+			// 	// Sent the data
+			// default:
+			// 	// Dropped the frame!
+			// }
 		}
 	}
 }
