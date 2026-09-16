@@ -14,7 +14,7 @@ const (
 	GiB
 )
 
-func stringifyRecordingProgress(s *bytes.Buffer, nBytes int) {
+func stringifyRecordingProgress(s *bytes.Buffer, nBytes int64) {
 	if nBytes < KiB {
 		fmt.Fprintf(s, "%d B", nBytes)
 	} else if nBytes < MiB {

@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ESilva15/TelemetryMockserver/constants"
 	bngsdk "github.com/ESilva15/gobngsdk"
 )
 
@@ -41,6 +42,8 @@ func NewReplayer(address string, port int, fp string) (*Replayer, error) {
 		Logger:           slog.Default().With("SDK", "BeamNG"),
 		SourceType:       bngsdk.BinaryFile,
 		BinSourcePath:    fp,
+		ExportData:       true,
+		ExportDataType:   bngsdk.UDPData,
 		ExportUDPAddress: address,
 		ExportUDPPort:    port,
 		Loop:             true,
@@ -73,7 +76,7 @@ func (r *Replayer) renderToTerminal(ctx context.Context) {
 
 			buf.Reset()
 			buf.WriteString("\x1b[2J\x1b[H")
-			fmt.Fprintf(&buf, "\x1b]0;%s - Replaying %d%%\x07", ProgramName, percent)
+			fmt.Fprintf(&buf, "\x1b]0;%s - Replaying %d%%\x07", constants.ProgramName, percent)
 
 			fmt.Fprintf(&buf, "Replayed: %d%%\n", percent)
 
@@ -88,7 +91,7 @@ func (r *Replayer) renderToTerminal(ctx context.Context) {
 func (r *Replayer) Replay(ctx context.Context, loop bool) error {
 	go r.renderToTerminal(ctx)
 
-	ticker := time.NewTicker(time.Second / 240)
+	ticker := time.NewTicker(time.Second / 60)
 	defer ticker.Stop()
 	for {
 		select {
