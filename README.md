@@ -1,23 +1,28 @@
-# BeamNGMockOG
-Utility to both record (with the caveat that it doesn't record yet) and replay
-binary data relating to the Outgauge struct of beamng.
+# TelemetryMockserver
+Utility to both record and replay telemetry data from multiple simulators.
 
 This will help me develop some stuff I'm doing for `ESDI` and my peripherals
 without having to be playing the game while doing it (fans are noisy).
 
 
+## Related projects
+- [ESDI](https://github.com/ESilva15/ESDI)
+- [iRacing Go SDK](https://github.com/ESilva15/goirsdk)
+- [BeamNG Go SDK](https://github.com/ESilva15/gobngsdk)
+
+
 # Installation
-`go install github.com/ESilva15/BeamNGMockOg@latest`
+`go install github.com/ESilva15/TelemetryMockserver@latest`
 
 
 # Usage
-To start replaying:
+To start replaying (BeamNG as an example):
 `telemetrymockserver beamng replay [--loop] -a 127.0.0.1 -p 4443 -i sunburstManual.bin`
 - `loop` allows the replay functionality to keep replaying the same data file
 
 
-To start recording:
-`BeamNGMockOg beamng record -a 127.0.0.1 -p 4443 -o sunburstDCT.bin`
+To start recording (BeamNG as an example):
+`TelemetryMockserver beamng record -a 127.0.0.1 -p 4443 -o sunburstDCT.bin`
 
 ## Development
 Use `tcpdump` to listen to the socket and check if data is coming through:
